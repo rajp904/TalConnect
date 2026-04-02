@@ -18,7 +18,7 @@ export const AuthProvider = ({ children }) => {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
-                withCredentials: true, // ✅ FIX (session cookie)
+                withCredentials: true, 
             });
 
             if (request.status === httpStatus.CREATED) {
@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }) => {
                 email,
                 password,
             }, {
-                withCredentials: true, // ✅ FIX (VERY IMPORTANT)
+                withCredentials: true, 
             });
 
             if (request.status === httpStatus.OK) {
@@ -58,7 +58,7 @@ export const AuthProvider = ({ children }) => {
     const logout = async () => {
         try {
             await client.post("/api/user/logout", {}, {
-                withCredentials: true, // ✅ FIX
+                withCredentials: true, 
             });
             setUserData(null);
             navigate("/");
@@ -72,7 +72,7 @@ export const AuthProvider = ({ children }) => {
         const fetchUserSession = async () => {
             try {
                 const response = await client.get("/api/user/me", {
-                    withCredentials: true, // ✅ MOST IMPORTANT FIX
+                    withCredentials: true, 
                 });
 
                 if (response.status === 200 && response.data.user) {

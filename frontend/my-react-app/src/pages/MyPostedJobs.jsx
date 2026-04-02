@@ -19,7 +19,7 @@ function MyPostedJobs() {
 
     const fetchPostedJobs = async () => {
       try {
-        setLoading(true); // ✅ ensure loading starts
+        setLoading(true); 
 
         const response = await api.get(
           "/api/jobPosting/my-jobs",
@@ -41,7 +41,7 @@ function MyPostedJobs() {
 
     fetchPostedJobs();
 
-  }, [userData?._id]); // ✅ FIX (important)
+  }, [userData?._id]); 
 
   // ✅ Handle delete
   const handleDelete = async (jobId) => {

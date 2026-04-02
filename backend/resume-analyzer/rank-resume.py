@@ -16,29 +16,49 @@ def extract_text_from_pdf(file):
             text += page_text + " "
     return text.lower()
 
-# ---------------- EMAIL EXTRACT ----------------
-def extract_email(text):
-    match = re.search(r"[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+", text)
-    return match.group() if match else "Not found"
+# ---------------- IMPORTANT KEYWORDS ONLY ----------------
+TECH_KEYWORDS = [
+    "python","java","c++","javascript","react","node","express",
+    "mongodb","sql","mysql","html","css","flask","django",
+    "api","backend","frontend","git","github","docker",
+    "aws","machine","learning","data","pandas","numpy"
+]
 
-# ---------------- NAME EXTRACT ----------------
-def extract_name(text):
-    lines = text.split("\n")
-    for line in lines[:10]:
-        line = line.strip()
-        if len(line.split()) <= 4 and line.isalpha():
-            return line.title()
-    return "Candidate"
-
-# ---------------- ATS SCORE ----------------
+# ---------------- SCORE ----------------
 def calculate_score(resume_text, job_description):
-    job_keywords = list(set(job_description.lower().split()))
-    match_count = sum(1 for word in job_keywords if word in resume_text)
 
-    if len(job_keywords) == 0:
-        return 0
+    resume_text = resume_text.lower()
+    job_description = job_description.lower()
 
-    return int((match_count / len(job_keywords)) * 100)
+    # only take relevant keywords from JD
+    jd_keywords = [word for word in TECH_KEYWORDS if word in job_description]
+
+    if len(jd_keywords) == 0:
+        jd_keywords = TECH_KEYWORDS[:10]  # fallback
+
+    keywords_data = []
+    matched = 0
+
+    for word in jd_keywords:
+        if word in resume_text:
+            present = True
+            matched += 1
+            percentage = 100
+        else:
+            present = False
+            percentage = 0
+
+        keywords_data.append({
+            "keyword": word,
+            "present": present,
+            "percentage": percentage
+        })
+
+    score = int((matched / len(jd_keywords)) * 100) if jd_keywords else 0
+
+    missing = [k["keyword"] for k in keywords_data if not k["present"]]
+
+    return score, keywords_data, missing
 
 # ---------------- /analyze ----------------
 @app.route('/analyze', methods=['POST'])
@@ -47,13 +67,12 @@ def analyze_resume():
         file = request.files.get('resume')
         job_description = request.form.get('job_description')
 
-        # ✅ USER DATA FROM FRONTEND
         name = request.form.get('userName', "Candidate")
         email = request.form.get('userEmail', "Not found")
 
         text = extract_text_from_pdf(file)
 
-        score = calculate_score(text, job_description)
+        score, _, _ = calculate_score(text, job_description)
 
         return jsonify({
             "Name": name,
@@ -73,22 +92,33 @@ def evaluate_resume():
 
         text = extract_text_from_pdf(file)
 
-        score = calculate_score(text, job_description)
+        score, keywords_data, missing = calculate_score(text, job_description)
 
         ranking = "Good" if score > 70 else "Average" if score > 40 else "Poor"
+
+        suggestions = []
+
+        if len(missing) > 0:
+            suggestions.append("Add these skills: " + ", ".join(missing[:5]))
+
+        if score < 50:
+            suggestions.append("Improve technical skills section")
+
+        if not suggestions:
+            suggestions.append("Resume looks good")
 
         return jsonify({
             "result": {
                 "match_percentage": score,
                 "ranking": ranking,
-                "keywords": [],
-                "suggestions": ["Add more relevant keywords", "Improve formatting"]
+                "keywords": keywords_data,
+                "suggestions": suggestions
             }
         })
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# ---------------- RUN ----------------
+
 if __name__ == '__main__':
     app.run(port=5001, debug=True)

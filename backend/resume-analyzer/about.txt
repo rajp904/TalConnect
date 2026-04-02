@@ -1,0 +1,22 @@
+# ---------------------------------------------------------
+# Resume Analyzer (ATS Engine)
+#
+# This module analyzes resumes against a given job description.
+# It extracts text from PDF resumes using PyPDF2, then compares
+# the content with predefined technical keywords.
+#
+# Technologies Used:
+# - Flask: for creating API endpoints (/analyze, /evaluate)
+# - Flask-CORS: to allow frontend communication
+# - PyPDF2: to extract text from PDF resumes
+# - Regex (re): for text cleaning and keyword matching
+#
+# Features:
+# - Calculates ATS match percentage
+# - Identifies matched and missing technical keywords
+# - Generates basic ranking (Good / Average / Poor)
+# - Provides suggestions to improve resume
+#
+# This acts as a lightweight ATS system integrated with the
+# main Node.js backend and React frontend.
+# ---------------------------------------------------------

@@ -16,7 +16,7 @@ function AnalyzeCandidates() {
     const analyze = async () => {
       try {
         const { data: job } = await api.get(`/api/jobPosting/${jobId}`, {
-          withCredentials: true, // ✅ FIX
+          withCredentials: true, 
         });
 
         if (!job) {
