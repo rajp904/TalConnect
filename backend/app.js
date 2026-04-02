@@ -11,7 +11,6 @@ const flash = require("connect-flash");
 
 const app = express();
 
-// ✅ CORS (LOCAL FRONTEND)
 app.use(cors({
   origin: "http://localhost:5173",
   credentials: true
@@ -23,18 +22,18 @@ const sessionOptions = {
   resave: false,
   saveUninitialized: false,
   store: MongoStore.create({
-    mongoUrl: process.env.MONGO_URL, // ✅ correct
+    mongoUrl: process.env.MONGO_URL, 
     collectionName: "sessions",
   }),
   cookie: {
     maxAge: 7 * 24 * 60 * 60 * 1000,
     httpOnly: true,
-    secure: false,      // local ke liye
-    sameSite: "lax",    // session fix
+    secure: false,      
+    sameSite: "lax",   
   },
 };
 
-// ✅ MIDDLEWARES
+// MIDDLEWARES
 app.use(express.json());
 app.use(cookieParser());
 app.set("trust proxy", 1);
@@ -42,18 +41,18 @@ app.set("trust proxy", 1);
 app.use(session(sessionOptions));
 app.use(flash());
 
-// ✅ FLASH MESSAGE HANDLER
+// FLASH MESSAGE HANDLER
 app.use((req, res, next) => {
   res.locals.success = req.flash("success");
   res.locals.error = req.flash("error");
   next();
 });
 
-// ✅ ROUTES
+// ROUTES
 app.use("/api/user", userRouter);
 app.use("/api/jobPosting", jobPostingRouter);
 
-// ✅ MONGODB CONNECTION
+// MONGODB CONNECTION
 mongoose.connect(process.env.MONGO_URL)
   .then(() => {
     console.log("✅ Connected to the database");
@@ -62,12 +61,12 @@ mongoose.connect(process.env.MONGO_URL)
     console.error("❌ Database connection error:", err);
   });
 
-// ✅ DEFAULT ROUTE
+// DEFAULT ROUTE
 app.get("/", (req, res) => {
   res.send("Backend is running 🚀");
 });
 
-// ✅ START SERVER
+// START SERVER
 const PORT = process.env.PORT || 8080;
 
 app.listen(PORT, () => {
@@ -75,4 +74,3 @@ app.listen(PORT, () => {
 });
 
 
-//prince cloud//

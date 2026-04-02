@@ -8,7 +8,7 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// 🟢 Storage for profile photos (JobConnect_Assets)
+// Storage for profile photos 
 const profilePhotoStorage = new CloudinaryStorage({
   cloudinary,
   params: async (req, file) => {
@@ -23,13 +23,12 @@ const profilePhotoStorage = new CloudinaryStorage({
       allowed_formats: ["jpg", "jpeg", "png", "webp"],
       transformation: [{ width: 500, height: 500, crop: "limit" }],
       type: "upload",
-      //upload_preset: "resume_unsigned",
       access_mode: "public",
     };
   },
 });
 
-// 🟢 Storage for resumes (Resumes folder)
+// Storage for resumes (Resumes folder)
 const resumeStorage = new CloudinaryStorage({
   cloudinary,
   params: async (req, file) => {

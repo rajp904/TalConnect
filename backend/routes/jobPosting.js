@@ -203,7 +203,7 @@ router.post("/sendBulkEmails", async (req, res) => {
 
       const score = candidate.score || 0;
 
-      // ✅ selection logic
+      // set the logic here
       const isSelected = score >= 60;
 
       const subject = isSelected
