@@ -19,8 +19,8 @@ const profilePhotoStorage = new CloudinaryStorage({
     return {
       folder: "JobConnect_Assets",
       resource_type: "image",
-      public_id: `${filename}-${Date.now()}.${extension}`,
-      allowed_formats: ["jpg", "jpeg", "png", "webp"],
+      public_id: `${filename}-${Date.now()}`,
+      allowed_formats: ["jpg", "jpeg", "png", "webp", "avif"],
       transformation: [{ width: 500, height: 500, crop: "limit" }],
       type: "upload",
       access_mode: "public",

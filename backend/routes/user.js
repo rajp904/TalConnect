@@ -57,6 +57,7 @@ router.post("/login", async (req, res) => {
 
 // ------------------- REGISTER -------------------
 router.post("/register", uploadProfilePhoto.single("profilePhoto"), async (req, res) => {
+    console.log("FILE:", req.file);
     const { name, username, email, password, role } = req.body;
 
     if (!username || !name || !email || !password || !role) {
@@ -71,15 +72,22 @@ router.post("/register", uploadProfilePhoto.single("profilePhoto"), async (req, 
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
+        let profilePhotoData = {};
+
+        if (req.file && req.file.path) {
+            profilePhotoData = {
+                url: req.file.path,
+                filename: req.file.filename || "uploaded"
+            };
+        }
+
         const newUser = new User({
             username,
             name,
             email,
             password: hashedPassword,
             role,
-            profilePhoto: req.file
-                ? { url: req.file.path, filename: req.file.filename }
-                : {},
+            profilePhoto: profilePhotoData,
         });
 
         await newUser.save();
