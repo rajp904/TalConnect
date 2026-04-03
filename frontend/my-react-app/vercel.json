@@ -1,6 +1,15 @@
 {
   "routes": [
     {
+      "src": "^/(assets/.*)",
+      "headers": { "cache-control": "max-age=31536000" },
+      "continue": true
+    },
+    {
+      "src": "^/(.*\\.(js|css|png|jpg|jpeg|svg|ico))$",
+      "dest": "/$1"
+    },
+    {
       "src": "/(.*)",
       "dest": "/index.html"
     }
