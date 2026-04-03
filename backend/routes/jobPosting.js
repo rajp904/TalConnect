@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const fs = require("fs");
 const Job = require("../models/jobDescription.js");
 const User = require("../models/user.js");
 const { uploadResume } = require("../cloudConfig.js");
@@ -145,7 +146,7 @@ router.post("/apply/:jobId", uploadResume.single("resume"), async (req, res) => 
 
     try {
       const formData = new FormData();
-      formData.append("resume", req.file.buffer || req.file.path);
+      formData.append("resume", fs.createReadStream(req.file.path));
       formData.append("job_description", job.description);
       formData.append("userName", user.name);
       formData.append("userEmail", user.email);
