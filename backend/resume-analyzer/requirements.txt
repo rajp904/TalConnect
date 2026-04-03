@@ -2,5 +2,4 @@ flask
 flask-cors
 PyPDF2
 python-dotenv
-langchain
-langchain-google-genai
+requests
