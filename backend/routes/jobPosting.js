@@ -5,6 +5,9 @@ const User = require("../models/user.js");
 const { uploadResume } = require("../cloudConfig.js");
 const nodemailer = require("nodemailer");
 const dotenv = require("dotenv");
+const axios = require("axios");          // ✅ ADDED
+const FormData = require("form-data");   // ✅ ADDED
+
 dotenv.config();
 
 // ------------------- POST JOB -------------------
@@ -125,12 +128,10 @@ router.post("/apply/:jobId", uploadResume.single("resume"), async (req, res) => 
       return res.status(404).json({ message: "User not found" });
     }
 
-    // ✅ resume check (IMPORTANT FIX)
     if (!req.file || !req.file.path) {
       return res.status(400).json({ message: "Resume upload failed" });
     }
 
-    // ✅ duplicate apply check
     const alreadyApplied = job.applicants.find(
       (app) => app.developer.toString() === user._id.toString()
     );
@@ -139,17 +140,40 @@ router.post("/apply/:jobId", uploadResume.single("resume"), async (req, res) => 
       return res.status(400).json({ message: "Already applied to this job" });
     }
 
+    // 🔥 PYTHON SCORE CALL
+    let score = 0;
+
+    try {
+      const formData = new FormData();
+      formData.append("resume", req.file.buffer || req.file.path);
+      formData.append("job_description", job.description);
+      formData.append("userName", user.name);
+      formData.append("userEmail", user.email);
+
+      const response = await axios.post(
+        "https://talconnect1.onrender.com/analyze", // ⚠️ apna python URL
+        formData,
+        { headers: formData.getHeaders() }
+      );
+
+      score = response.data.matching_percent || 0;
+
+    } catch (err) {
+      console.error("Python API error:", err.message);
+    }
+
     job.applicants.push({
       developer: user._id,
-      name: user.name,              // ✅ FIX
-      email: user.email,           // ✅ FIX
+      name: user.name,
+      email: user.email,
       resumeUrl: req.file?.secure_url || req.file?.path,
+      score: score, // ✅ ADDED
       appliedAt: new Date(),
     });
 
     await job.save();
 
-    res.json({ message: "Applied successfully" });
+    res.json({ message: "Applied successfully", score });
 
   } catch (error) {
     console.error("Apply error:", error);
@@ -171,7 +195,7 @@ router.delete("/:jobId", async (req, res) => {
 router.get("/:jobId", async (req, res) => {
   try {
     const job = await Job.findById(req.params.jobId)
-      .populate("applicants.developer", "name email"); // ✅ FIX
+      .populate("applicants.developer", "name email");
 
     res.json(job);
   } catch (error) {
@@ -179,6 +203,7 @@ router.get("/:jobId", async (req, res) => {
     res.status(500).json({ message: "Error fetching job" });
   }
 });
+
 // ------------------- SEND BULK EMAILS -------------------
 router.post("/sendBulkEmails", async (req, res) => {
   try {
@@ -188,7 +213,6 @@ router.post("/sendBulkEmails", async (req, res) => {
       return res.status(400).json({ message: "No candidates provided" });
     }
 
-    // 🔥 transporter setup
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -197,13 +221,11 @@ router.post("/sendBulkEmails", async (req, res) => {
       },
     });
 
-    // 🔥 send mails one by one
     for (let candidate of candidates) {
       if (!candidate.email || candidate.email === "N/A") continue;
 
       const score = candidate.score || 0;
 
-      // set the logic here
       const isSelected = score >= 60;
 
       const subject = isSelected
