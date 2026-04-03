@@ -12,10 +12,11 @@ const flash = require("connect-flash");
 const app = express();
 
 app.use(cors({
-  origin: ["http://localhost:5173", "https://talconnect.vercel.app"],
+  origin: "https://talconnect.vercel.app", // 🔥 string only
   credentials: true
 }));
 
+app.set("trust proxy", 1);
 // ✅ SESSION CONFIG (FIXED)
 const sessionOptions = {
   secret: process.env.SESSION_SECRET || "mysecret",
