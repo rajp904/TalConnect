@@ -2,6 +2,8 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from PyPDF2 import PdfReader
 import re
+import requests
+from io import BytesIO
 
 app = Flask(__name__)
 CORS(app)
@@ -70,7 +72,20 @@ def analyze_resume():
         name = request.form.get('userName', "Candidate")
         email = request.form.get('userEmail', "Not found")
 
-        text = extract_text_from_pdf(file)
+        # ✅ CASE 1: file upload
+        if file:
+            text = extract_text_from_pdf(file)
+
+        # ✅ CASE 2: URL (Cloudinary)
+        else:
+            import requests
+            from io import BytesIO
+
+            resume_url = request.form.get("resume")
+            response = requests.get(resume_url)
+            file_stream = BytesIO(response.content)
+
+            text = extract_text_from_pdf(file_stream)
 
         score, _, _ = calculate_score(text, job_description)
 
@@ -83,14 +98,26 @@ def analyze_resume():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# ---------------- /evaluate ----------------
 @app.route('/evaluate', methods=['POST'])
 def evaluate_resume():
     try:
         file = request.files.get('resume')
         job_description = request.form.get('job_description')
 
-        text = extract_text_from_pdf(file)
+        # ✅ CASE 1: file upload
+        if file:
+            text = extract_text_from_pdf(file)
+
+        # ✅ CASE 2: URL (Cloudinary)
+        else:
+            import requests
+            from io import BytesIO
+
+            resume_url = request.form.get("resume")
+            response = requests.get(resume_url)
+            file_stream = BytesIO(response.content)
+
+            text = extract_text_from_pdf(file_stream)
 
         score, keywords_data, missing = calculate_score(text, job_description)
 

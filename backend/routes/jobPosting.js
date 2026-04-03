@@ -146,7 +146,8 @@ router.post("/apply/:jobId", uploadResume.single("resume"), async (req, res) => 
 
     try {
       const formData = new FormData();
-      formData.append("resume", fs.createReadStream(req.file.path));
+      
+      formData.append("resume", req.file.path);
       formData.append("job_description", job.description);
       formData.append("userName", user.name);
       formData.append("userEmail", user.email);
