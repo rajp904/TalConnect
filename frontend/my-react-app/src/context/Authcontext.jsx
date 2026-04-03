@@ -15,9 +15,6 @@ export const AuthProvider = ({ children }) => {
     const handleRegister = async (formData) => {
         try {
             const request = await client.post("/api/user/register", formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
                 withCredentials: true, 
             });
 

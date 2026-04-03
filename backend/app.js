@@ -28,8 +28,8 @@ const sessionOptions = {
   cookie: {
     maxAge: 7 * 24 * 60 * 60 * 1000,
     httpOnly: true,
-    secure: false,      
-    sameSite: "lax",   
+    secure: true,      
+    sameSite: "none",   
   },
 };
 
