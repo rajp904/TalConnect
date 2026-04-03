@@ -59,7 +59,7 @@ function AnalyzeCandidates() {
               formData.append("job_description", jobDesc);
 
               const { data } = await axios.post(
-                "http://localhost:5001/analyze",
+                "https://talconnect1.onrender.com/evaluate",
                 formData,
                 {
                   headers: { "Content-Type": "multipart/form-data" },

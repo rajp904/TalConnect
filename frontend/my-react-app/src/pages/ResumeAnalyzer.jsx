@@ -21,7 +21,7 @@ function ResumeAnalyzer() {
     setLoading(true);
     try {
       // ✅ IMPORTANT FIX → correct backend (Flask)
-      const res = await axios.post("http://localhost:5001/evaluate", formData, {
+      const res = await axios.post("https://talconnect1.onrender.com/evaluate", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
